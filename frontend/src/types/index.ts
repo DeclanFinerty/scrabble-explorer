@@ -65,6 +65,19 @@ export interface WordInfoResponse {
   family: WordFamily | null;
 }
 
+export interface RackWordResult {
+  word: string;
+  score: number;
+  length: number;
+  bingo: boolean;
+  blank_positions: number[];
+}
+
+export interface RackResponse {
+  words: RackWordResult[];
+  total_count: number;
+}
+
 // Letter point values (standard Scrabble)
 export const LETTER_VALUES: Record<string, number> = {
   A: 1, B: 3, C: 3, D: 2, E: 1, F: 4,

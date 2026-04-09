@@ -1,4 +1,7 @@
+import { useState } from "react";
 import type { WordFamily } from "../types";
+
+const INITIAL_SHOW = 5;
 
 function BranchGroup({
   title,
@@ -9,15 +12,29 @@ function BranchGroup({
   items: { word: string; affix: string; score: number }[];
   onWordClick: (word: string) => void;
 }) {
+  const [expanded, setExpanded] = useState(false);
   if (items.length === 0) return null;
+
+  const visible = expanded ? items : items.slice(0, INITIAL_SHOW);
+  const remaining = items.length - INITIAL_SHOW;
 
   return (
     <div>
-      <h4 className="mb-2 text-xs font-semibold uppercase tracking-wider text-gray-400">
-        {title}
-      </h4>
+      <div className="mb-2 flex items-center gap-2">
+        <h4 className="text-xs font-semibold uppercase tracking-wider text-gray-400">
+          {title}
+        </h4>
+        {remaining > 0 && (
+          <button
+            onClick={() => setExpanded(!expanded)}
+            className="text-xs font-medium text-indigo-600 hover:text-indigo-800 cursor-pointer transition-colors"
+          >
+            {expanded ? "Show less" : `+${remaining} more`}
+          </button>
+        )}
+      </div>
       <div className="space-y-0.5">
-        {items.map((item) => (
+        {visible.map((item) => (
           <button
             key={item.word}
             onClick={() => onWordClick(item.word)}
@@ -30,7 +47,7 @@ function BranchGroup({
               {item.word}
             </span>
             <span className="text-xs text-gray-400">
-              {title === "Prefixes" ? `+${item.affix}` : `+${item.affix}`}
+              +{item.affix}
             </span>
             <span className="ml-auto text-xs text-gray-400">
               {item.score} pts

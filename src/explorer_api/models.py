@@ -105,6 +105,7 @@ class RackWordResult(BaseModel):
     score: int
     length: int
     bingo: bool
+    blank_positions: list[int] = []
 
 
 class RackResponse(BaseModel):

@@ -23,7 +23,7 @@ An interactive word search and exploration tool for Scrabble players. Build comp
 
 ### Prerequisites
 
-- Python 3.14+, [uv](https://docs.astral.sh/uv/)
+- Python 3.11+, [uv](https://docs.astral.sh/uv/)
 - Node.js 18+, npm
 - The `scrabble-engine` repo cloned as a sibling directory (`../scrabble-engine`)
 

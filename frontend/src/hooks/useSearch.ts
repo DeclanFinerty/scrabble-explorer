@@ -1,16 +1,20 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { searchWords } from "../api/client";
-import type { FilterChipData, SearchResponse, SortMode } from "../types";
+import type { FilterChipData, SearchResponse, SortMode, WordResult } from "../types";
 import { useDebounce } from "./useDebounce";
+
+const DISPLAY_LIMIT = 100;
 
 export function useSearch() {
   const [chips, setChips] = useState<FilterChipData[]>([]);
   const [sort, setSort] = useState<SortMode>("score");
+  const [descending, setDescending] = useState(true);
   const [results, setResults] = useState<SearchResponse | null>(null);
   const [loading, setLoading] = useState(false);
 
   const debouncedChips = useDebounce(chips, 250);
   const debouncedSort = useDebounce(sort, 250);
+  const debouncedDesc = useDebounce(descending, 250);
 
   const addChip = useCallback((chip: FilterChipData) => {
     const SINGLETON_TYPES = new Set(["starting_with", "ending_with"]);
@@ -30,6 +34,15 @@ export function useSearch() {
     setChips((prev) => prev.map((c) => (c.id === id ? updated : c)));
   }, []);
 
+  const toggleSort = useCallback((s: SortMode) => {
+    if (s === sort) {
+      setDescending((prev) => !prev);
+    } else {
+      setSort(s);
+      setDescending(true);
+    }
+  }, [sort]);
+
   useEffect(() => {
     if (debouncedChips.length === 0) {
       setResults(null);
@@ -40,7 +53,7 @@ export function useSearch() {
     setLoading(true);
 
     const filters = debouncedChips.map((c) => c.filter);
-    searchWords(filters, debouncedSort).then(
+    searchWords(filters, debouncedSort, debouncedDesc, 10000).then(
       (data) => {
         if (!cancelled) {
           setResults(data);
@@ -55,7 +68,19 @@ export function useSearch() {
     return () => {
       cancelled = true;
     };
-  }, [debouncedChips, debouncedSort]);
+  }, [debouncedChips, debouncedSort, debouncedDesc]);
 
-  return { chips, sort, results, loading, addChip, removeChip, updateChip, setSort };
+  // All words for charts (full result set from API)
+  const allWords: WordResult[] = results?.words ?? [];
+
+  // Display-limited slice for the results list
+  const displayResults = useMemo<SearchResponse | null>(() => {
+    if (!results) return null;
+    return {
+      ...results,
+      words: results.words.slice(0, DISPLAY_LIMIT),
+    };
+  }, [results]);
+
+  return { chips, sort, descending, allWords, displayResults, loading, addChip, removeChip, updateChip, toggleSort };
 }

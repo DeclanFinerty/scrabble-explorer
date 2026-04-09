@@ -6,12 +6,14 @@ import { useDebounce } from "./useDebounce";
 export function useRack() {
   const [letters, setLetters] = useState<string[]>(Array(7).fill(""));
   const [sort, setSort] = useState<SortMode>("score");
+  const [descending, setDescending] = useState(true);
   const [results, setResults] = useState<RackResponse | null>(null);
   const [loading, setLoading] = useState(false);
 
   const filledLetters = letters.filter((l) => l !== "");
   const debouncedLetters = useDebounce(filledLetters, 300);
   const debouncedSort = useDebounce(sort, 300);
+  const debouncedDesc = useDebounce(descending, 300);
 
   const setLetter = useCallback((index: number, value: string) => {
     setLetters((prev) => {
@@ -26,6 +28,15 @@ export function useRack() {
     setResults(null);
   }, []);
 
+  const toggleSort = useCallback((s: SortMode) => {
+    if (s === sort) {
+      setDescending((prev) => !prev);
+    } else {
+      setSort(s);
+      setDescending(true);
+    }
+  }, [sort]);
+
   useEffect(() => {
     if (debouncedLetters.length === 0) {
       setResults(null);
@@ -35,7 +46,7 @@ export function useRack() {
     let cancelled = false;
     setLoading(true);
 
-    solveRack(debouncedLetters, debouncedSort).then(
+    solveRack(debouncedLetters, debouncedSort, debouncedDesc).then(
       (data) => {
         if (!cancelled) {
           setResults(data);
@@ -50,7 +61,7 @@ export function useRack() {
     return () => {
       cancelled = true;
     };
-  }, [debouncedLetters, debouncedSort]);
+  }, [debouncedLetters, debouncedSort, debouncedDesc]);
 
-  return { letters, sort, results, loading, setLetter, setSort, clearRack };
+  return { letters, sort, descending, results, loading, setLetter, toggleSort, clearRack };
 }

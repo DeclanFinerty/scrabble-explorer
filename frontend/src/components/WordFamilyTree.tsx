@@ -66,27 +66,16 @@ export function WordFamilyTree({
   family: WordFamily;
   onWordClick: (word: string) => void;
 }) {
-  const extensions = family.extensions.map((e) => ({
-    word: e.word,
-    affix: e.suffix,
-    score: e.score,
-  }));
+  const extensions = family.extensions
+    .map((e) => ({ word: e.word, affix: e.suffix, score: e.score }))
+    .sort((a, b) => a.affix.length - b.affix.length);
 
-  const prefixes = family.prefixes.map((p) => ({
-    word: p.word,
-    affix: p.prefix,
-    score: p.score,
-  }));
+  const prefixes = family.prefixes
+    .map((p) => ({ word: p.word, affix: p.prefix, score: p.score }))
+    .sort((a, b) => a.affix.length - b.affix.length);
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center gap-2">
-        <span className="rounded bg-indigo-100 px-2.5 py-1 font-mono text-sm font-bold text-indigo-700">
-          {family.root}
-        </span>
-        <span className="text-xs text-gray-400">root word</span>
-      </div>
-
       <BranchGroup
         title="Extensions"
         items={extensions}

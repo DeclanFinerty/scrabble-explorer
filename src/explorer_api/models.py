@@ -77,12 +77,14 @@ SearchFilter = Annotated[
 class SearchRequest(BaseModel):
     filters: list[SearchFilter]
     sort: Literal["score", "length", "alphabetical"] = "score"
+    descending: bool = True
     limit: int = 100
 
 
 class RackRequest(BaseModel):
     letters: list[str]
     sort: Literal["score", "length", "alphabetical"] = "score"
+    descending: bool = True
     limit: int = 50
 
 

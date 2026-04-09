@@ -6,18 +6,27 @@ const SORT_OPTIONS: { value: SortMode; label: string }[] = [
   { value: "alphabetical", label: "A-Z" },
 ];
 
+function SortArrow({ active, descending }: { active: boolean; descending: boolean }) {
+  if (!active) return null;
+  return (
+    <span className="ml-0.5 text-[10px]">{descending ? "\u25BC" : "\u25B2"}</span>
+  );
+}
+
 export function ResultsList({
   results,
   loading,
   sort,
-  onSortChange,
+  descending,
+  onToggleSort,
   onWordClick,
   selectedWord,
 }: {
   results: SearchResponse | null;
   loading: boolean;
   sort: SortMode;
-  onSortChange: (s: SortMode) => void;
+  descending: boolean;
+  onToggleSort: (s: SortMode) => void;
   onWordClick: (word: string) => void;
   selectedWord: string | null;
 }) {
@@ -53,7 +62,7 @@ export function ResultsList({
           {SORT_OPTIONS.map((opt) => (
             <button
               key={opt.value}
-              onClick={() => onSortChange(opt.value)}
+              onClick={() => onToggleSort(opt.value)}
               className={`rounded-md px-3 py-1 text-xs font-medium transition-colors cursor-pointer ${
                 sort === opt.value
                   ? "bg-indigo-100 text-indigo-700"
@@ -61,6 +70,7 @@ export function ResultsList({
               }`}
             >
               {opt.label}
+              <SortArrow active={sort === opt.value} descending={descending} />
             </button>
           ))}
         </div>

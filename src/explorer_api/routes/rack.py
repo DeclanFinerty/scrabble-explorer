@@ -14,14 +14,14 @@ def _score_with_blanks(word: str, blank_positions: tuple[int, ...]) -> int:
     )
 
 
-def _sort_rack_results(words: list[RackWordResult], sort: str) -> list[RackWordResult]:
+def _sort_rack_results(words: list[RackWordResult], sort: str, descending: bool = True) -> list[RackWordResult]:
     match sort:
         case "score":
-            return sorted(words, key=lambda w: w.score, reverse=True)
+            return sorted(words, key=lambda w: w.score, reverse=descending)
         case "length":
-            return sorted(words, key=lambda w: w.length, reverse=True)
+            return sorted(words, key=lambda w: w.length, reverse=descending)
         case "alphabetical":
-            return sorted(words, key=lambda w: w.word)
+            return sorted(words, key=lambda w: w.word, reverse=descending)
     return words
 
 
@@ -46,7 +46,7 @@ def solve_rack(body: RackRequest, request: Request):
             )
 
     results = list(best.values())
-    results = _sort_rack_results(results, body.sort)
+    results = _sort_rack_results(results, body.sort, body.descending)
     total_count = len(results)
     limited = results[: body.limit]
 

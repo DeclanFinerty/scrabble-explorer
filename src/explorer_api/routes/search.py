@@ -2,8 +2,10 @@ from fastapi import APIRouter, Request
 from scrabble_engine import WordQuery, word_score
 
 from explorer_api.models import (
-    ContainingFilter,
     EndingWithFilter,
+    FromLettersOnlyFilter,
+    HasLettersFilter,
+    HasSubstringFilter,
     LengthFilter,
     LetterAtFilter,
     MatchingPatternFilter,
@@ -18,24 +20,31 @@ from explorer_api.models import (
 router = APIRouter()
 
 
-def _apply_filter(query: WordQuery, f) -> WordQuery:
+def _apply_filter(query: WordQuery, f) -> tuple[WordQuery, None] | tuple[WordQuery, str]:
+    """Apply a filter to the query. Returns (query, substring) where substring
+    is non-None only for has_substring filters that need post-filtering."""
     match f:
-        case ContainingFilter():
-            return query.containing(f.value)
+        case HasLettersFilter():
+            return query.containing(f.value), None
+        case HasSubstringFilter():
+            return query, f.value
         case NotContainingFilter():
-            return query.not_containing(f.value)
+            return query.not_containing(f.value), None
+        case FromLettersOnlyFilter():
+            return query.from_rack(list(f.value)), None
         case StartingWithFilter():
-            return query.starting_with(f.value)
+            return query.starting_with(f.value), None
         case EndingWithFilter():
-            return query.ending_with(f.value)
+            return query.ending_with(f.value), None
         case LengthFilter():
-            return query.length(min=f.min, max=f.max)
+            return query.length(min=f.min, max=f.max), None
         case LetterAtFilter():
-            return query.letter_at(f.position, f.letter)
+            return query.letter_at(f.position, f.letter), None
         case MatchingPatternFilter():
-            return query.matching_pattern(f.value)
+            return query.matching_pattern(f.value), None
         case MinScoreFilter():
-            return query.min_score(f.value)
+            return query.min_score(f.value), None
+    return query, None
 
 
 def _apply_sort(query: WordQuery, sort: str) -> WordQuery:
@@ -54,11 +63,20 @@ def search_words(body: SearchRequest, request: Request):
     dawg = request.app.state.dawg
     query = WordQuery(dawg)
 
+    substrings: list[str] = []
     for f in body.filters:
-        query = _apply_filter(query, f)
+        query, substring = _apply_filter(query, f)
+        if substring is not None:
+            substrings.append(substring)
 
     query = _apply_sort(query, body.sort)
     all_words = query.execute()
+
+    if substrings:
+        all_words = [
+            w for w in all_words if all(s in w for s in substrings)
+        ]
+
     total_count = len(all_words)
     limited = all_words[: body.limit]
 

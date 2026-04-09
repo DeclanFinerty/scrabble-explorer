@@ -3,7 +3,7 @@ import type { SearchResponse, SortMode } from "../types";
 const SORT_OPTIONS: { value: SortMode; label: string }[] = [
   { value: "score", label: "Score" },
   { value: "length", label: "Length" },
-  { value: "alphabetical", label: "A–Z" },
+  { value: "alphabetical", label: "A-Z" },
 ];
 
 export function ResultsList({
@@ -11,11 +11,15 @@ export function ResultsList({
   loading,
   sort,
   onSortChange,
+  onWordClick,
+  selectedWord,
 }: {
   results: SearchResponse | null;
   loading: boolean;
   sort: SortMode;
   onSortChange: (s: SortMode) => void;
+  onWordClick: (word: string) => void;
+  selectedWord: string | null;
 }) {
   if (!results && !loading) {
     return (
@@ -74,9 +78,14 @@ export function ResultsList({
       ) : results ? (
         <div className="divide-y divide-gray-100 rounded-lg border border-gray-200 bg-white shadow-sm overflow-hidden">
           {results.words.map((w) => (
-            <div
+            <button
               key={w.word}
-              className="flex items-center justify-between px-4 py-2.5 hover:bg-gray-50 transition-colors cursor-pointer"
+              onClick={() => onWordClick(w.word)}
+              className={`flex w-full items-center justify-between px-4 py-2.5 text-left transition-colors cursor-pointer ${
+                selectedWord === w.word
+                  ? "bg-indigo-50"
+                  : "hover:bg-gray-50"
+              }`}
             >
               <span className="font-mono font-semibold tracking-wide text-gray-800">
                 {w.word}
@@ -89,7 +98,7 @@ export function ResultsList({
                 <span className="text-gray-300">|</span>
                 <span>{w.length} letters</span>
               </div>
-            </div>
+            </button>
           ))}
         </div>
       ) : null}

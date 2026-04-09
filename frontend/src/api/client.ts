@@ -1,4 +1,4 @@
-import type { SearchFilter, SearchResponse, SortMode } from "../types";
+import type { SearchFilter, SearchResponse, SortMode, WordInfoResponse } from "../types";
 
 export async function searchWords(
   filters: SearchFilter[],
@@ -11,5 +11,11 @@ export async function searchWords(
     body: JSON.stringify({ filters, sort, limit }),
   });
   if (!resp.ok) throw new Error(`Search failed: ${resp.status}`);
+  return resp.json();
+}
+
+export async function getWordInfo(word: string): Promise<WordInfoResponse> {
+  const resp = await fetch(`/api/word/${encodeURIComponent(word)}`);
+  if (!resp.ok) throw new Error(`Word lookup failed: ${resp.status}`);
   return resp.json();
 }

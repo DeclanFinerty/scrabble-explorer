@@ -17,6 +17,7 @@ function generateSuggestions(input: string): Suggestion[] {
       label: `Matching pattern ${trimmed}`,
       filter: { type: "matching_pattern", value: trimmed },
     });
+    return suggestions;
   }
 
   // Pure number → length and min score
@@ -43,22 +44,29 @@ function generateSuggestions(input: string): Suggestion[] {
     return suggestions;
   }
 
-  // Letters only
-  if (/^[A-Z]+$/.test(trimmed)) {
+  // Single letter
+  if (/^[A-Z]$/.test(trimmed)) {
     suggestions.push(
-      { label: `Containing ${trimmed}`, filter: { type: "containing", value: trimmed } },
+      { label: `Has letter ${trimmed}`, filter: { type: "has_letters", value: trimmed } },
       { label: `Starting with ${trimmed}`, filter: { type: "starting_with", value: trimmed } },
       { label: `Ending with ${trimmed}`, filter: { type: "ending_with", value: trimmed } },
-      { label: `Not containing ${trimmed}`, filter: { type: "not_containing", value: trimmed } }
+      { label: `Not containing ${trimmed}`, filter: { type: "not_containing", value: trimmed } },
+      { label: `${trimmed} at position 0`, filter: { type: "letter_at", position: 0, letter: trimmed } },
     );
+    return suggestions;
+  }
 
-    // Single letter → also offer letter_at
-    if (trimmed.length === 1) {
-      suggestions.push({
-        label: `Letter ${trimmed} at position...`,
-        filter: { type: "letter_at", position: 0, letter: trimmed },
-      });
-    }
+  // Multiple letters
+  if (/^[A-Z]+$/.test(trimmed)) {
+    suggestions.push(
+      { label: `Has letters ${trimmed.split("").join(", ")}`, filter: { type: "has_letters", value: trimmed } },
+      { label: `Has substring "${trimmed}"`, filter: { type: "has_substring", value: trimmed } },
+      { label: `From letters only: ${trimmed}`, filter: { type: "from_letters_only", value: trimmed } },
+      { label: `Starting with ${trimmed}`, filter: { type: "starting_with", value: trimmed } },
+      { label: `Ending with ${trimmed}`, filter: { type: "ending_with", value: trimmed } },
+      { label: `Not containing ${trimmed.split("").join(", ")}`, filter: { type: "not_containing", value: trimmed } },
+    );
+    return suggestions;
   }
 
   return suggestions;

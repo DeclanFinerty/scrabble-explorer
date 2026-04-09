@@ -13,11 +13,21 @@ export function useSearch() {
   const debouncedSort = useDebounce(sort, 250);
 
   const addChip = useCallback((chip: FilterChipData) => {
-    setChips((prev) => [...prev, chip]);
+    const SINGLETON_TYPES = new Set(["starting_with", "ending_with"]);
+    setChips((prev) => {
+      const filtered = SINGLETON_TYPES.has(chip.filter.type)
+        ? prev.filter((c) => c.filter.type !== chip.filter.type)
+        : prev;
+      return [...filtered, chip];
+    });
   }, []);
 
   const removeChip = useCallback((id: string) => {
     setChips((prev) => prev.filter((c) => c.id !== id));
+  }, []);
+
+  const updateChip = useCallback((id: string, updated: FilterChipData) => {
+    setChips((prev) => prev.map((c) => (c.id === id ? updated : c)));
   }, []);
 
   useEffect(() => {
@@ -47,5 +57,5 @@ export function useSearch() {
     };
   }, [debouncedChips, debouncedSort]);
 
-  return { chips, sort, results, loading, addChip, removeChip, setSort };
+  return { chips, sort, results, loading, addChip, removeChip, updateChip, setSort };
 }

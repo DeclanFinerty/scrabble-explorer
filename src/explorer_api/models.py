@@ -5,13 +5,23 @@ from pydantic import BaseModel, Field
 
 # --- Filter types (discriminated union) ---
 
-class ContainingFilter(BaseModel):
-    type: Literal["containing"]
+class HasLettersFilter(BaseModel):
+    type: Literal["has_letters"]
+    value: str
+
+
+class HasSubstringFilter(BaseModel):
+    type: Literal["has_substring"]
     value: str
 
 
 class NotContainingFilter(BaseModel):
     type: Literal["not_containing"]
+    value: str
+
+
+class FromLettersOnlyFilter(BaseModel):
+    type: Literal["from_letters_only"]
     value: str
 
 
@@ -48,8 +58,10 @@ class MinScoreFilter(BaseModel):
 
 
 SearchFilter = Annotated[
-    ContainingFilter
+    HasLettersFilter
+    | HasSubstringFilter
     | NotContainingFilter
+    | FromLettersOnlyFilter
     | StartingWithFilter
     | EndingWithFilter
     | LengthFilter

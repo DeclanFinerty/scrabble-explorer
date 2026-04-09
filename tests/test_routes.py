@@ -11,9 +11,9 @@ def client():
 
 
 class TestSearch:
-    def test_single_filter(self, client):
+    def test_has_letters(self, client):
         resp = client.post("/api/search", json={
-            "filters": [{"type": "containing", "value": "Z"}],
+            "filters": [{"type": "has_letters", "value": "Z"}],
             "sort": "score",
             "limit": 10,
         })
@@ -24,10 +24,49 @@ class TestSearch:
         for w in data["words"]:
             assert "Z" in w["word"]
 
+    def test_has_letters_multiple(self, client):
+        resp = client.post("/api/search", json={
+            "filters": [{"type": "has_letters", "value": "QZ"}],
+            "sort": "score",
+            "limit": 10,
+        })
+        assert resp.status_code == 200
+        for w in resp.json()["words"]:
+            assert "Q" in w["word"]
+            assert "Z" in w["word"]
+
+    def test_has_substring(self, client):
+        resp = client.post("/api/search", json={
+            "filters": [{"type": "has_substring", "value": "ING"}],
+            "sort": "score",
+            "limit": 10,
+        })
+        assert resp.status_code == 200
+        data = resp.json()
+        assert data["total_count"] > 0
+        for w in data["words"]:
+            assert "ING" in w["word"]
+
+    def test_from_letters_only(self, client):
+        resp = client.post("/api/search", json={
+            "filters": [{"type": "from_letters_only", "value": "SATIRE"}],
+            "sort": "score",
+            "limit": 100,
+        })
+        assert resp.status_code == 200
+        data = resp.json()
+        assert data["total_count"] > 0
+        available = list("SATIRE")
+        for w in data["words"]:
+            remaining = available.copy()
+            for ch in w["word"]:
+                assert ch in remaining, f"{w['word']} uses letter {ch} not available"
+                remaining.remove(ch)
+
     def test_multiple_filters(self, client):
         resp = client.post("/api/search", json={
             "filters": [
-                {"type": "containing", "value": "Z"},
+                {"type": "has_letters", "value": "Z"},
                 {"type": "not_containing", "value": "U"},
                 {"type": "length", "min": 3, "max": 5},
             ],
@@ -110,7 +149,7 @@ class TestSearch:
 
     def test_limit_respected(self, client):
         resp = client.post("/api/search", json={
-            "filters": [{"type": "containing", "value": "E"}],
+            "filters": [{"type": "has_letters", "value": "E"}],
             "limit": 5,
         })
         assert resp.status_code == 200

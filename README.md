@@ -2,6 +2,10 @@
 
 An interactive word search and exploration tool for Scrabble players. Build composable queries with filter chips, solve racks, explore word families, and visualize result distributions — all powered by an in-memory DAWG for instant lookups across 178K+ words.
 
+![Search example](assets/search_example_1.png)
+
+![Rack solver example](assets/rack-solve_example_1.png)
+
 ## Features
 
 - **Search with filter chips** — type letters, numbers, or patterns to add stackable filters (has letters, starts/ends with, length, pattern matching, min score, and more). Results update live as chips are added or removed.
@@ -11,7 +15,7 @@ An interactive word search and exploration tool for Scrabble players. Build comp
 
 ## Stack
 
-- **Backend:** FastAPI + [scrabble-engine](https://github.com/your-org/scrabble-engine) (DAWG, WordQuery, rack solving, word families)
+- **Backend:** FastAPI + [scrabble-engine](https://github.com/DeclanFinerty/scrabble-engine) (DAWG, WordQuery, rack solving, word families)
 - **Frontend:** React, TypeScript, Vite, Tailwind CSS
 - **Dictionary:** TWL06 (Tournament Word List, North American Scrabble)
 

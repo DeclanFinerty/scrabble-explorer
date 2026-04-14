@@ -53,9 +53,7 @@ def _apply_sort(query: WordQuery, sort: str, descending: bool = True) -> WordQue
         case "length":
             return query.sort_by_length(descending=descending)
         case "alphabetical":
-            if descending:
-                return query.sort_alphabetically()
-            return query.sort_alphabetically()
+            return query.sort_alphabetically(descending=descending)
     return query
 
 
@@ -69,9 +67,6 @@ def search_words(body: SearchRequest, request: Request):
 
     query = _apply_sort(query, body.sort, body.descending)
     all_words = query.execute()
-
-    if body.sort == "alphabetical" and not body.descending:
-        all_words = list(reversed(all_words))
 
     total_count = len(all_words)
     limited = all_words[: body.limit]

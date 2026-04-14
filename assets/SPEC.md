@@ -112,7 +112,7 @@ Execute a chained word query.
 }
 ```
 
-The backend builds a `WordQuery`, applies each filter, executes, and returns results. Invalid filter types return 400.
+The backend builds a `WordQuery`, applies each filter via the corresponding `scrabble-engine` method, executes, and returns results. All filtering logic (including substring matching, letter constraints, pattern matching, rack solving, and scoring) is delegated to `scrabble-engine`'s `WordQuery` builder — the explorer backend contains no filtering logic of its own.
 
 #### `GET /word/{word}`
 
@@ -292,6 +292,22 @@ Add basic text parsing to the search bar — detect patterns like "Q without U" 
 - **Every word is a link to more information.** Click any word anywhere in the app and you can see its score, family, and details.
 - **Mobile-friendly.** Chips and cards work well on small screens. No hover-dependent interactions.
 - **Fast.** The DAWG is in memory, queries should return in under 100ms, the UI should feel instant.
+
+---
+
+## Hardcoded Values & Known Limits
+
+The following values are currently hardcoded and should be made configurable or addressed in future work:
+
+| Value | Location | Description |
+|-------|----------|-------------|
+| `10000` | `frontend/src/hooks/useSearch.ts:56` | Max results requested from the API per search. Passed as the `limit` parameter to `searchWords()`. |
+| `100` (`DISPLAY_LIMIT`) | `frontend/src/hooks/useSearch.ts:6,81` | Max words rendered in the results list. The full API response is used for charts, but the visible word list is sliced to 100. Users have no way to page through or load more results. |
+| `250` (ms) | `frontend/src/hooks/useSearch.ts:15-17` | Debounce delay before triggering an API call after filter/sort changes. |
+| `100` | `backend models SearchRequest.limit` | Default API limit when none is provided by the client. |
+| `50` | `backend models RackRequest.limit` | Default API limit for rack solver results. |
+
+The `DISPLAY_LIMIT` of 100 is the most impactful — users see "4,523 results" but can only view 100 of them. A proper solution would be virtualized scrolling (e.g., `react-window`) or pagination with a "load more" control.
 
 ---
 

@@ -23,7 +23,7 @@ function App() {
 
   useEffect(() => setSelectedWord(null), [tab]);
   useEffect(() => setSelectedWord(null), [search.displayResults]);
-  useEffect(() => setSelectedWord(null), [rack.results]);
+  useEffect(() => setSelectedWord(null), [rack.letters]);
 
   const handleWordClick = (word: string) => {
     setSelectedWord(word);

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FilterBar } from "./components/FilterBar";
 import { LengthDistribution } from "./components/LengthDistribution";
 import { LetterFrequency } from "./components/LetterFrequency";
@@ -20,6 +20,10 @@ function App() {
 
   const search = useSearch();
   const rack = useRack();
+
+  useEffect(() => setSelectedWord(null), [tab]);
+  useEffect(() => setSelectedWord(null), [search.displayResults]);
+  useEffect(() => setSelectedWord(null), [rack.results]);
 
   const handleWordClick = (word: string) => {
     setSelectedWord(word);

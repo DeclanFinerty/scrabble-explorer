@@ -47,16 +47,16 @@ export function ResultsList({
     <div className="mt-6">
       <div className="flex items-center justify-between mb-3">
         <p className="text-sm text-gray-500">
-          {loading ? (
+          {loading && !results ? (
             "Searching..."
-          ) : (
+          ) : results ? (
             <>
               <span className="font-semibold text-gray-700">
-                {results!.total_count.toLocaleString()}
+                {results.total_count.toLocaleString()}
               </span>{" "}
               words match
             </>
-          )}
+          ) : null}
         </p>
         <div className="flex gap-1">
           {SORT_OPTIONS.map((opt) => (

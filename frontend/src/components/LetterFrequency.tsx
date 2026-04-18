@@ -24,10 +24,7 @@ export function LetterFrequency({ words }: { words: WordResult[] }) {
 
   return (
     <div>
-      <div className="mb-3 flex items-center gap-2">
-        <h4 className="text-xs font-semibold uppercase tracking-wider text-gray-400">
-          Letter frequency
-        </h4>
+      <div className="mb-3">
         <button
           onClick={() => setSortBy(sortBy === "frequency" ? "alpha" : "frequency")}
           className="text-[10px] font-medium text-indigo-600 hover:text-indigo-800 cursor-pointer transition-colors"

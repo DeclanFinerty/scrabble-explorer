@@ -1,11 +1,9 @@
 import { useEffect, useState } from "react";
+import { ChartsSidebar } from "./components/ChartsSidebar";
 import { FilterBar } from "./components/FilterBar";
-import { LengthDistribution } from "./components/LengthDistribution";
-import { LetterFrequency } from "./components/LetterFrequency";
 import { RackInput } from "./components/RackInput";
 import { RackResults } from "./components/RackResults";
 import { ResultsList } from "./components/ResultsList";
-import { ScoreDistribution } from "./components/ScoreDistribution";
 import { SearchBar } from "./components/SearchBar";
 import { WordCard } from "./components/WordCard";
 import { useRack } from "./hooks/useRack";
@@ -16,7 +14,6 @@ type Tab = "search" | "rack";
 function App() {
   const [tab, setTab] = useState<Tab>("search");
   const [selectedWord, setSelectedWord] = useState<string | null>(null);
-  const [chartsOpen, setChartsOpen] = useState(false);
 
   const search = useSearch();
   const rack = useRack();
@@ -33,7 +30,7 @@ function App() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="mx-auto max-w-3xl px-4 py-10">
+      <div className="mx-auto max-w-6xl px-4 py-10">
         <header className="mb-6 text-center">
           <h1 className="text-3xl font-bold tracking-tight text-gray-900">
             Scrabble Explorer
@@ -89,47 +86,24 @@ function App() {
               </div>
             )}
 
-            {hasResults && (
-              <div className="mt-4">
-                <button
-                  onClick={() => setChartsOpen(!chartsOpen)}
-                  className="flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-gray-700 cursor-pointer transition-colors"
-                >
-                  <svg
-                    className={`h-4 w-4 transition-transform ${chartsOpen ? "rotate-90" : ""}`}
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
-                  Charts
-                </button>
-                {chartsOpen && (
-                  <div className="mt-3 grid grid-cols-1 gap-4 sm:grid-cols-2">
-                    <div className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
-                      <ScoreDistribution words={search.allWords} />
-                    </div>
-                    <div className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
-                      <LengthDistribution words={search.allWords} />
-                    </div>
-                    <div className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm sm:col-span-2">
-                      <LetterFrequency words={search.allWords} />
-                    </div>
-                  </div>
-                )}
+            <div className={hasResults ? "mt-6 flex gap-6" : ""}>
+              <div className="min-w-0 flex-[3]">
+                <ResultsList
+                  results={search.displayResults}
+                  loading={search.loading}
+                  sort={search.sort}
+                  descending={search.descending}
+                  onToggleSort={search.toggleSort}
+                  onWordClick={handleWordClick}
+                  selectedWord={selectedWord}
+                />
               </div>
-            )}
-
-            <ResultsList
-              results={search.displayResults}
-              loading={search.loading}
-              sort={search.sort}
-              descending={search.descending}
-              onToggleSort={search.toggleSort}
-              onWordClick={handleWordClick}
-              selectedWord={selectedWord}
-            />
+              {hasResults && (
+                <div className="flex-[2] sticky top-10 self-start">
+                  <ChartsSidebar words={search.allWords} />
+                </div>
+              )}
+            </div>
           </>
         )}
 

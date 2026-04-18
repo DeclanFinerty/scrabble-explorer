@@ -19,9 +19,6 @@ export function ScoreDistribution({ words }: { words: WordResult[] }) {
 
   return (
     <div>
-      <h4 className="mb-3 text-xs font-semibold uppercase tracking-wider text-gray-400">
-        Score distribution
-      </h4>
       <div className="space-y-1.5">
         {counts.map((b) => (
           <div key={b.label} className="flex items-center gap-2">

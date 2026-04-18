@@ -14,9 +14,6 @@ export function LengthDistribution({ words }: { words: WordResult[] }) {
 
   return (
     <div>
-      <h4 className="mb-3 text-xs font-semibold uppercase tracking-wider text-gray-400">
-        Length distribution
-      </h4>
       <div className="space-y-1.5">
         {lengths.map((len) => (
           <div key={len} className="flex items-center gap-2">
